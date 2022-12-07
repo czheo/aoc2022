@@ -10,20 +10,13 @@ enum FS {
 
 fn main() {
     let fs = parse();
-    let mut sizes: Vec<usize> = Vec::new();
-    let mut total: usize = 0;
+    let mut ans = 0;
     for path in fs.keys() {
         let size = get_size(path, &fs);
-        sizes.push(size);
-        if path == "/" {
-            total = size;
+        if size <= 100000 {
+            ans += size;
         }
-    }
-    let mut ans = total;
-    for size in sizes {
-        if size >= total - 40000000 {
-            ans = std::cmp::min(ans, size);
-        }
+        println!("{} {}", path, size);
     }
     println!("{}", ans);
 }
