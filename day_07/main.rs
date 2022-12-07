@@ -35,10 +35,8 @@ fn get_size(path: &str, fs: &HashMap<String, Vec<FS>>) -> usize {
             FS::File(_, s) => size += s,
             FS::Dir(name) => {
                 let mut this_path = path.to_string();
-                if this_path != "/" {
-                    this_path.push('/');
-                }
                 this_path.push_str(name);
+                this_path.push('/');
                 size += get_size(&this_path, fs);
             },
         };
@@ -66,23 +64,16 @@ fn parse() -> HashMap<String, Vec<FS>> {
                 update_fs(&pwd, &mut fs);
             },
             ["$", "ls"] => {},
-            ["dir", name] => {
-                let mut path = to_full_path(&pwd);
+            [something, name] => {
+                let path = to_full_path(&pwd);
                 let fs_list = fs.get_mut(&path).unwrap();
-                path.push('/');
-                path.push_str(name);
-                let fs = FS::Dir(name.to_string());
-                fs_list.push(fs);
-            },
-            [size, name] => {
-                let mut path = to_full_path(&pwd);
-                let fs_list = fs.get_mut(&path).unwrap();
-                path.push('/');
-                path.push_str(name);
-                let fs = FS::File(
-                    name.to_string(),
-                    size.parse().unwrap()
-                );
+                let fs = match something {
+                    "dir" => FS::Dir(name.to_string()),
+                    _ => FS::File(
+                        name.to_string(),
+                        something.parse().unwrap() // file size
+                    ),
+                };
                 fs_list.push(fs);
             },
             _ => panic!("unknown input {}", line),
@@ -93,14 +84,12 @@ fn parse() -> HashMap<String, Vec<FS>> {
 }
 
 fn to_full_path(pwd: &Vec<String>) -> String {
-    if pwd.is_empty() {
-        return "/".to_string();
-    }
     let mut ret = String::new();
     for p in pwd {
         ret.push('/');
         ret.push_str(p);
     }
+    ret.push('/');
     return ret;
 }
 
