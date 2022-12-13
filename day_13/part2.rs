@@ -8,12 +8,28 @@ enum List {
     Num(u32),
 }
 
+trait ListMacroProcessor {
+    fn process(self) -> List;
+}
+
+impl ListMacroProcessor for List {
+    fn process(self) -> List {
+        self
+    }
+}
+
+impl ListMacroProcessor for u32 {
+    fn process(self) -> List {
+        List::Num(self)
+    }
+}
+
 macro_rules! list {
     ( $( $x:expr ),* ) => {
         {
             let mut v = Vec::new();
             $(
-                v.push($x);
+                v.push($x.process());
             )*
             List::List(v)
         }
@@ -36,8 +52,8 @@ impl Ord for List {
     fn cmp(&self, other: &Self) -> Ordering {
         match (self, other) {
             (List::Num(n1), List::Num(n2)) => n1.cmp(n2),
-            (List::Num(n1), _) => list![num![*n1]].cmp(other),
-            (_, List::Num(n2)) => self.cmp(&list![num![*n2]]),
+            (List::Num(n1), _) => list![*n1].cmp(other),
+            (_, List::Num(n2)) => self.cmp(&list![*n2]),
             (List::List(v1), List::List(v2)) => {
                 for (x, y) in v1.iter().zip(v2.iter()) {
                     let ord = x.cmp(y);
@@ -63,8 +79,8 @@ fn main() {
             break; // line break
         }
     }
-    let p1 = list![list![num![2]]];
-    let p2 = list![list![num![6]]];
+    let p1 = list![list![2]];
+    let p2 = list![list![6]];
     v.push(p1.clone());
     v.push(p2.clone());
     v.sort();
