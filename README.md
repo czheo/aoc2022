@@ -1,5 +1,7 @@
 https://adventofcode.com/2022
 
+![AoC 2022](https://github.com/czheo/aoc2022/raw/main/screenshot.png)
+
 Run with rustc 1.65.0
 
 ```
